@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Преступный дизайн</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('prison-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        
+        /* Сцена с картиной */
+        .crime-scene {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(45deg, rgba(255, 0, 0, 0.7), rgba(139, 0, 0, 0.7));
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            backdrop-filter: blur(3px);
+            border: 2px solid #8b0000;
+        }
+        
+        .picture {
+            width: 200px;
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            border: 5px solid #8b0000;
+            position: relative;
+            animation: swing 3s ease-in-out infinite;
+            transform-origin: top center;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Гвоздь и кровь */
+        .picture::before {
+            content: "";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background-color: #8b0000;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px #ff0000;
+        }
+        
+        .nail {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 20px;
+            background-color: #555;
+            z-index: 2;
+        }
+        
+        /* Анимация крови */
+        .blood {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            animation: bloodDrip 2s forwards;
+            background: radial-gradient(circle, rgba(255,0,0,0.8) 0%, rgba(139,0,0,0) 70%);
+        }
+        
+        /* Прицел и выстрел */
+        .scope {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 2px solid red;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: scopeAim 1s 2s forwards, scopeShoot 0.3s 3s forwards;
+        }
+        
+        .crosshair {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(0deg, rgba(255,255,255,0) 45%, red 45%, red 55%, rgba(255,255,255,0) 55%),
+                linear-gradient(90deg, rgba(255,255,255,0) 45%, red 45%, red 55%, rgba(255,255,255,0) 55%);
+        }
+        
+        .bullet-hole {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: black;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: bulletAppear 0.3s 3.3s forwards;
+        }
+        
+        /* Досье (скрыто изначально) */
+        .dossier {
+            position: absolute;
+            width: 80%;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #8b0000;
+            border-radius: 10px;
+            padding: 20px;
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.5s 3.8s forwards;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        
+        .dossier-header {
+            width: 100%;
+            height: 150px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-bottom: 20px;
+        }
+        
+        .dossier-content {
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .dossier-part {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .dossier-part.active {
+            position: relative;
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+        
+        .dossier-nav {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        
+        .dossier-nav button {
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .dossier-nav button:hover {
+            background: #ff0000;
+        }
+        
+        .dossier-nav button.active {
+            background: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        }
+        
+        .telegram-link {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            color: #0088cc;
+            text-decoration: none;
+            transition: all 0.3s;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        
+        .telegram-link:hover {
+            background: rgba(0, 136, 204, 0.1);
+        }
+        
+        .telegram-link img {
+            width: 24px;
+            margin-right: 10px;
+        }
+        
+        /* Анимации */
+        @keyframes swing {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        @keyframes bloodDrip {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes scopeAim {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @keyframes scopeShoot {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+        }
+        
+        @keyframes bulletAppear {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Сцена с картиной -->
+    <div class="crime-scene" id="crimeScene">
+        <div class="nail"></div>
+        <div class="picture" id="picture">
+            <div class="blood" id="blood"></div>
+            <div class="scope" id="scope">
+                <div class="crosshair"></div>
+            </div>
+            <div class="bullet-hole" id="bulletHole"></div>
+        </div>
+    </div>
+    
+    <!-- Аудио для выстрела (скрыто) -->
+    <audio id="shotSound" src="gunshot.mp3" preload="auto"></audio>
+    
+    <!-- Досье (появляется после выстрела) -->
+    <div class="dossier" id="dossier">
+        <div class="dossier-header" id="dossierHeader"></div>
+        
+        <div class="dossier-nav">
+            <button class="active" onclick="showPart(1)">О Себе</button>
+            <button onclick="showPart(2)">Ссылочки</button>
+            <button onclick="showPart(3)">Прощания</button>
+        </div>
+        
+        <div class="dossier-content">
+            <!-- Часть 1: О себе -->
+            <div class="dossier-part active" id="part1">
+                <h2>О Себе</h2>
+                <p>Привет, я Никита! Мне 16 лет, я люблю заниматься кодингом, а также играть в игры. Но в последнее время я занялся своей реальной жизнью: стал больше гулять и т. д. Так что в сети бываю не очень часто. Но ты пиши!  </p>
+                <p>Работаю только с проверенными клиентами. Конфиденциальность гарантирую.</p>
+            </div>
+            
+            <!-- Часть 2: Ссылки -->
+            <div class="dossier-part" id="part2">
+                <h2>Полезные Ссылки</h2>
+                <a href="https://t.me/user_ret24" class="telegram-link" target="_blank">
+                    <img src="telegram-icon.png" alt="Telegram">
+                    Личные сообщения
+                </a>
+                <a href="https://t.me/hospital_ret24" class="telegram-link" target="_blank">
+                    <img src="telegram-icon.png" alt="Telegram">
+                    Канал
+                </a>
+                <a href="https://t.me/+FQ_x9GLEDnVkYWRh" class="telegram-link" target="_blank">
+                    <img src="telegram-icon.png" alt="Telegram">
+                    Друзья
+                </a>
+                <a href="https://t.me/+ssDFJRvk8ZZhZjM5" class="telegram-link" target="_blank">
+                    <img src="telegram-icon.png" alt="Telegram">
+                    Росписи
+                </a>
+                <a href="https://t.me/+MynzSYzI8i1jODAx" class="telegram-link" target="_blank">
+                    <img src="telegram-icon.png" alt="Telegram">
+                    Прайс-лист
+                </a>
+                <a href="https://t.me/+HTaclABGcc00Y2Ex" class="telegram-link" target="_blank">
+                    <img src="telegram-icon.png" alt="Telegram">
+                    Отзывы
+                </a>
+                <a href="https://ret24-creator.github.io/REESTOR-/" class="telegram-link" target="_blank">
+                    <img src="chrome-icon.png" alt="Chrome">
+                    Реестр иноагентов
+                </a>
+            </div>
+            
+            <!-- Часть 3: Заключение -->
+            <div class="dossier-part" id="part3">
+                <h2>Заключение</h2>
+                <p>Буду рад каждому знакомству. Пишите в Telegram по любым вопросам.</p>
+                <p>Работаю профессионально, быстро, без лишних вопросов.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Загрузка картинки
+        const picture = document.getElementById('picture');
+        const img = new Image();
+        
+        img.src = 'crime-image.jpg';
+        
+        img.onload = function() {
+            picture.style.backgroundImage = `url('${img.src}')`;
+        };
+        
+        img.onerror = function() {
+            picture.style.backgroundColor = 'white';
+            picture.innerHTML += `
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:red; text-align:center;">
+                    Файл "crime-image.jpg" не найден!<br>
+                    Положите изображение в папку с сайтом.
+                </div>
+            `;
+        };
+        
+        // Загрузка картинки для досье
+        const dossierHeader = document.getElementById('dossierHeader');
+        const headerImg = new Image();
+        headerImg.src = '2.jpg';
+        
+        headerImg.onload = function() {
+            dossierHeader.style.backgroundImage = `url('${headerImg.src}')`;
+        };
+        
+        headerImg.onerror = function() {
+            dossierHeader.innerHTML = '<h2 style="text-align:center; color: #ff0000; text-shadow: 0 0 5px black;">ДОСЬЕ</h2>';
+        };
+        
+        // Анимация крови (начинается сразу)
+        document.getElementById('blood').style.opacity = '1';
+        
+        // Звук выстрела
+        const shotSound = document.getElementById('shotSound');
+        
+        // Через 2 секунды - прицел и выстрел
+        setTimeout(() => {
+            const scope = document.getElementById('scope');
+            scope.style.opacity = '1';
+            
+            setTimeout(() => {
+                // Проигрываем звук выстрела
+                shotSound.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
+                
+                scope.style.opacity = '0';
+                document.getElementById('bulletHole').style.opacity = '1';
+                
+                // Переход к досье
+                setTimeout(() => {
+                    document.getElementById('crimeScene').style.display = 'none';
+                    document.getElementById('dossier').style.display = 'block';
+                }, 300);
+            }, 1000);
+        }, 2000);
+        
+        // Переключение между частями досье
+        function showPart(partNum) {
+            // Обновляем активные кнопки
+            document.querySelectorAll('.dossier-nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Плавное переключение разделов
+            document.querySelectorAll('.dossier-part').forEach(part => {
+                part.classList.remove('active');
+            });
+            
+            setTimeout(() => {
+                document.getElementById(`part${partNum}`).classList.add('active');
+            }, 10);
+        }
+        
+        // Обработка ошибки автовоспроизведения звука
+        document.addEventListener('click', function() {
+            shotSound.play().catch(e => console.log("Звук не может быть воспроизведен:", e));
+        }, { once: true });
+    </script>
+</body>
+</html>
